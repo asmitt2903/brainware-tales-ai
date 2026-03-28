@@ -32,7 +32,6 @@
     position: relative;
   }
 
-  /* Animated parchment bg */
   body::before {
     content: '';
     position: fixed; inset: 0; z-index: 0;
@@ -49,7 +48,6 @@
     background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(8,11,20,0.92) 100%);
   }
 
-  /* ── SIDEBAR ── */
   .sidebar {
     position: relative; z-index: 10;
     width: 200px;
@@ -144,7 +142,6 @@
     margin-bottom: 8px;
   }
 
-  /* ── MAIN CHAT ── */
   .chat {
     position: relative; z-index: 10;
     flex: 1;
@@ -153,7 +150,6 @@
     overflow: hidden;
   }
 
-  /* Header */
   .chat-header {
     padding: 18px 28px;
     border-bottom: 1px solid var(--border);
@@ -186,7 +182,7 @@
   .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,.6); animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-  /* Messages */
+
   .messages {
     flex: 1;
     padding: 24px 28px;
@@ -200,7 +196,6 @@
   .messages::-webkit-scrollbar { width: 4px; }
   .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-  /* Welcome state */
   .welcome {
     margin: auto;
     text-align: center;
@@ -232,7 +227,6 @@
   }
   .chip:hover { background: rgba(201,168,76,.18); transform: translateY(-1px); }
 
-  /* Message bubbles */
   .msg {
     max-width: 72%;
     padding: 14px 18px;
@@ -322,7 +316,6 @@
     animation: fadeUp .5s ease both;
   }
 
-  /* ── INPUT BOX ── */
   .input-area {
     padding: 16px 24px;
     border-top: 1px solid var(--border);
@@ -399,7 +392,6 @@
     margin-top: 8px;
   }
 
-  /* Responsive */
   @media (max-width: 640px) {
     .sidebar { display: none; }
   }
@@ -407,7 +399,6 @@
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     BrainWare<br>Tales
