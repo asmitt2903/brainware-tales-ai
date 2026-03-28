@@ -32,7 +32,7 @@ function hfHeaders() {
   };
 }
 
-// ── STORY API ─────────────────────────────────────────────────
+
 app.post("/api/story", async (req, res) => {
   const { prompt } = req.body;
 
