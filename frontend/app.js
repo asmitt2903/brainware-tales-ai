@@ -148,8 +148,6 @@ function buildStoryBubble(storyText, prompt) {
   return div;
 }
 
-
-// ── Image generation ──────────────────────────────────────────
 async function generateImage(encodedPrompt, parentBubble) {
   const prompt = decodeURIComponent(encodedPrompt);
 
