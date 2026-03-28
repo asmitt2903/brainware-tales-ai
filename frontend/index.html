@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainWare Tales</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080b14;
+    --surface:   rgba(10, 15, 30, 0.82);
+    --surface2:  rgba(20, 28, 50, 0.9);
+    --border:    rgba(180, 140, 80, 0.18);
+    --gold:      #c9a84c;
+    --gold2:     #f0d080;
+    --rose:      #e8607a;
+    --blue:      #4a9eff;
+    --text:      #e8e0d0;
+    --muted:     #7a7060;
+    --glow-gold: rgba(201,168,76,0.15);
+  }
+
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Lora', serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    height: 100vh;
+    position: relative;
+  }
+
+  /* Animated parchment bg */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 30% 20%, rgba(201,168,76,0.07) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(74,158,255,0.06) 0%, transparent 60%),
+      url("https://tse3.mm.bing.net/th/id/OIP.5cZAuxRB6538FqaTuqv3RQHaFo?pid=Api") center/cover no-repeat;
+    filter: brightness(0.25) sepia(0.4);
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(8,11,20,0.92) 100%);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: relative; z-index: 10;
+    width: 200px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    backdrop-filter: blur(20px);
+    animation: slideLeft .5s ease both;
+  }
+
+  @keyframes slideLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+
+  .sidebar-logo {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: .72rem;
+    color: var(--gold);
+    text-align: center;
+    letter-spacing: .06em;
+    padding: 10px 0 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .sidebar-logo span { display: block; font-size: .55rem; color: var(--muted); font-family: 'Inter', sans-serif; margin-top: 4px; font-weight: 300; letter-spacing: .15em; text-transform: uppercase; }
+
+  .sb-btn {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%;
+    padding: 10px 14px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: .82rem;
+    font-weight: 400;
+    transition: all .2s;
+    text-align: left;
+  }
+
+  .sb-btn:hover {
+    background: rgba(201,168,76,.08);
+    border-color: var(--border);
+    color: var(--gold2);
+  }
+
+  .sb-btn.danger:hover { background: rgba(232,96,122,.1); border-color: rgba(232,96,122,.3); color: var(--rose); }
+
+  .sb-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+  .voice-section { margin-top: auto; }
+  .voice-label {
+    font-family: 'Inter', sans-serif;
+    font-size: .65rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 4px;
+    margin-bottom: 8px;
+  }
+
+  .voice-slider-wrap { padding: 6px 4px; }
+  .voice-slider-wrap label { font-family: 'Inter', sans-serif; font-size: .72rem; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .voice-slider-wrap input[type=range] {
+    width: 100%;
+    accent-color: var(--gold);
+    height: 3px;
+    cursor: pointer;
+  }
+
+  .voice-select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: .78rem;
+    padding: 7px 10px;
+    outline: none;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+
+  /* ── MAIN CHAT ── */
+  .chat {
+    position: relative; z-index: 10;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .chat-header {
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: fadeDown .5s ease both;
+  }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+
+  .header-title {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 1.1rem;
+    color: var(--gold);
+    letter-spacing: .04em;
+  }
+
+  .header-title span { color: var(--gold2); }
+
+  .header-status {
+    display: flex; align-items: center; gap: 7px;
+    font-family: 'Inter', sans-serif;
+    font-size: .75rem;
+    color: var(--muted);
+  }
+
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,.6); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* Messages */
+  .messages {
+    flex: 1;
+    padding: 24px 28px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* Welcome state */
+  .welcome {
+    margin: auto;
+    text-align: center;
+    max-width: 400px;
+    animation: fadeUp .7s ease both;
+  }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+  .welcome-icon { font-size: 3rem; margin-bottom: 16px; }
+  .welcome h2 { font-family: 'Cinzel Decorative', cursive; font-size: 1.2rem; color: var(--gold); margin-bottom: 10px; }
+  .welcome p { font-size: .88rem; color: var(--muted); line-height: 1.7; font-style: italic; }
+
+  .suggestion-chips {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+    margin-top: 20px;
+  }
+
+  .chip {
+    padding: 7px 14px;
+    background: rgba(201,168,76,.08);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-size: .78rem;
+    color: var(--gold);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .chip:hover { background: rgba(201,168,76,.18); transform: translateY(-1px); }
+
+  /* Message bubbles */
+  .msg {
+    max-width: 72%;
+    padding: 14px 18px;
+    border-radius: 18px;
+    line-height: 1.75;
+    font-size: .9rem;
+    animation: fadeUp .3s ease both;
+    position: relative;
+  }
+
+  .msg.user {
+    background: linear-gradient(135deg, rgba(201,168,76,.25), rgba(232,96,122,.2));
+    border: 1px solid rgba(201,168,76,.3);
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+    color: var(--gold2);
+    font-style: italic;
+  }
+
+  .msg.bot {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+    color: var(--text);
+  }
+
+  .msg.bot.loading {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted);
+    font-style: italic;
+    font-size: .85rem;
+  }
+
+  .dots { display: flex; gap: 4px; }
+  .dots span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold);
+    animation: bounce .9s infinite;
+  }
+  .dots span:nth-child(2) { animation-delay: .15s; }
+  .dots span:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-7px)} }
+
+  .story-controls {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .ctrl-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-size: .75rem;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    transition: all .15s;
+  }
+  .ctrl-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .ctrl-btn.active { background: rgba(201,168,76,.15); border-color: var(--gold); color: var(--gold); }
+  .ctrl-btn svg { width: 12px; height: 12px; }
+
+  .tts-bar {
+    height: 3px; background: var(--border); border-radius: 2px;
+    margin-top: 8px; overflow: hidden; display: none;
+  }
+  .tts-bar.active { display: block; }
+  .tts-progress {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+    border-radius: 2px;
+    transition: width .3s;
+  }
+
+  .gen-img {
+    max-width: 280px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    margin-top: 14px;
+    display: block;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    animation: fadeUp .5s ease both;
+  }
+
+  /* ── INPUT BOX ── */
+  .input-area {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+  }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 6px 8px 6px 18px;
+    transition: border .2s, box-shadow .2s;
+  }
+
+  .input-row:focus-within {
+    border-color: rgba(201,168,76,.45);
+    box-shadow: 0 0 0 3px var(--glow-gold);
+  }
+
+  #input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-size: .9rem;
+    padding: 6px 0;
+  }
+
+  #input::placeholder { color: var(--muted); font-style: italic; }
+
+  .send-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 18px;
+    background: linear-gradient(135deg, var(--gold), #a07030);
+    color: #1a1000;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: .82rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .2s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,168,76,.4); }
+  .send-btn:active { transform: none; }
+
+  .img-btn {
+    padding: 9px 14px;
+    background: rgba(74,158,255,.12);
+    border: 1px solid rgba(74,158,255,.25);
+    color: var(--blue);
+    border-radius: 12px;
+    font-size: .82rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all .2s;
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .img-btn:hover { background: rgba(74,158,255,.2); transform: translateY(-1px); }
+
+  .input-hint {
+    font-family: 'Inter', sans-serif;
+    font-size: .7rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    BrainWare<br>Tales
+    <span>AI Story Engine</span>
+  </div>
+
+  <button class="sb-btn" onclick="clearChat()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+    Clear Chat
+  </button>
+
+  <button class="sb-btn" id="btn-stop-voice" onclick="stopVoice()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    Stop Voice
+  </button>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="voice-section">
+    <div class="sidebar-divider"></div>
+    <p class="voice-label">Voice Settings</p>
+
+    <select class="voice-select" id="voice-select">
+      <option value="">Loading voices…</option>
+    </select>
+  </div>
+</aside>
+
+<div class="chat">
+  <div class="chat-header">
+    <div class="header-title">Brain<span>Ware</span> Tales</div>
+  </div>
+
+  <div id="messages" class="messages">
+    <div class="welcome" id="welcome-screen">
+      <div class="welcome-icon">📖</div>
+      <h2>Tell Me a Story</h2>
+      <p>Enter any idea below and I'll weave it into an immersive tale — narrated aloud and illustrated just for you.</p>
+      <div class="suggestion-chips">
+        <div class="chip" onclick="useChip(this)">a story about a lost astronaut</div>
+        <div class="chip" onclick="useChip(this)">a story about a dragon chef</div>
+        <div class="chip" onclick="useChip(this)">a story about time travel gone wrong</div>
+        <div class="chip" onclick="useChip(this)">a story about an AI that dreams</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-row">
+      <input id="input" placeholder="Describe your story idea…" autocomplete="off" />
+      <button class="send-btn" onclick="sendMessage()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Generate
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
